@@ -8,6 +8,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 option(STATIC_QT "Use static Qt5 libraries" ON)
 
 if(STATIC_QT)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
+    find_package(Qt5Core REQUIRED)
     set(QT_PREFIX StaticQt5)
 else()
     set(QT_PREFIX Qt5)
@@ -21,7 +23,6 @@ foreach(pkg ${QT5_PKGS})
     find_package(${QT_PREFIX}${pkg} REQUIRED)
     list(APPEND QT5_LIBS ${QT_PREFIX}::${pkg})
 endforeach()
-
 
 # Turn on automatic invocation of the MOC
 set(CMAKE_AUTOMOC ON)
