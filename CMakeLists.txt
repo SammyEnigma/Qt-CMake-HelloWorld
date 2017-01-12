@@ -8,7 +8,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 option(STATIC_QT "Use static Qt5 libraries" ON)
 
 if(STATIC_QT)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -static-libgcc -static-libstdc++")
+    set(LINKER_FLAGS -static -static-libstdc++ -static-libgcc)
     find_package(Qt5Core REQUIRED)
     set(QT_PREFIX StaticQt5)
 else()
@@ -37,11 +37,20 @@ set(CMAKE_AUTORCC ON)
 #            "-DCMAKE_PREFIX_PATH=\"path/to/Qt5/lib/cmake\" or with set(CMAKE_PREFIX_PATH path/to/Qt5/lib/cmake)")
 #endif(NOT CMAKE_PREFIX_PATH AND NOT Qt5Widgets_DIR)
 
-# Add a compiler flag
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra --pedantic")
+
+if(WIN32)
+    set(EXE_TYPE WIN32)
+endif()
 
 # Tell CMake to create the helloworld executable
-add_executable(helloworld main.cpp mainwindow.cpp mainwindow.ui resources.qrc)
+add_executable(helloworld ${EXE_TYPE} main.cpp mainwindow.cpp mainwindow.ui resources.qrc)
 
 # Add the Qt5 Widgets for linking
-target_link_libraries(helloworld ${QT5_LIBS})
+target_link_libraries(helloworld ${LINKER_FLAGS} ${QT5_LIBS})
+
+if(STATIC_QT)
+    set_target_properties(helloworld PROPERTIES
+        LINK_SEARCH_START_STATIC ON
+        LINK_SEARCH_END_STATIC ON)
+endif()
